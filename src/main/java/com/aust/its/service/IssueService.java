@@ -152,4 +152,24 @@ public class IssueService {
 
         return issueRepository.save(issue);
     }
+
+    public Issue updateAssignee(Long issueId, Long developerId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new RuntimeException("Issue not found with ID: " + issueId));
+
+        Developer developer = developerService.getById(developerId);
+
+        if(IssueStatus.PENDING.equals(issue.getStatus()) ||
+                IssueStatus.INPROGRESS.equals(issue.getStatus())) {
+            issue.setAssignedTo(developer);
+        }
+        else if(IssueStatus.COMPLETED.equals(issue.getStatus())) {
+            issue.setResolvedBy(developer);
+        }
+        else if(IssueStatus.REJECTED.equals(issue.getStatus())) {
+            issue.setRejectedBy(developer);
+        }
+
+        return issueRepository.save(issue);
+    }
 }

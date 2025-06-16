@@ -68,4 +68,10 @@ public class IssueController {
                               @RequestBody IssueStatusUpdatePayload issueStatusUpdatePayload) {
         return issueService.updateIssueByStatus(id, issueStatusUpdatePayload);
     }
+
+    @PutMapping("{id}/assign")
+    public Issue updateAssignee(@PathVariable("id") Long issueId,
+                                @RequestBody AssignDeveloperPayload assignDeveloperPayload) {
+        return issueService.updateAssignee(issueId, assignDeveloperPayload.developerId());
+    }
 }
