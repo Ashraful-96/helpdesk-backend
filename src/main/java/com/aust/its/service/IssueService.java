@@ -135,19 +135,59 @@ public class IssueService {
         User user = userService.getById(issueStatusUpdatePayload.workedBy());
         Developer developer = developerService.getByUserId(user.getId());
 
-        if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
-            issue.setStatus(IssueStatus.REJECTED);
-            issue.setRejectedBy(developer);
-            issue.setRejectionReason(issueStatusUpdatePayload.rejectionReason());
+        if(IssueStatus.PENDING.equals(issueStatusUpdatePayload.fromStatus()) ||
+                IssueStatus.INPROGRESS.equals(issueStatusUpdatePayload.fromStatus())) {
+
+            if(IssueStatus.PENDING.equals(issueStatusUpdatePayload.toStatus()) ||
+                    IssueStatus.INPROGRESS.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setAssignedTo(developer);
+            }
+            else if(IssueStatus.COMPLETED.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setAssignedTo(null);
+                issue.setResolvedBy(developer);
+            }
+            else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setAssignedTo(null);
+                issue.setRejectedBy(developer);
+            }
         }
-        else if(IssueStatus.PENDING.equals(issueStatusUpdatePayload.toStatus()) ||
-                IssueStatus.INPROGRESS.equals(issueStatusUpdatePayload.toStatus())) {
-            issue.setStatus(issueStatusUpdatePayload.toStatus());
-            issue.setAssignedTo(developer);
+        else if(IssueStatus.COMPLETED.equals(issueStatusUpdatePayload.fromStatus())) {
+            if(IssueStatus.PENDING.equals(issueStatusUpdatePayload.toStatus()) ||
+                    IssueStatus.INPROGRESS.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setAssignedTo(developer);
+                issue.setResolvedBy(null);
+            }
+            else if(IssueStatus.COMPLETED.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setAssignedTo(null);
+                issue.setResolvedBy(developer);
+            }
+            else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setResolvedBy(null);
+                issue.setRejectedBy(developer);
+            }
         }
-        else if(IssueStatus.COMPLETED.equals(issueStatusUpdatePayload.toStatus())) {
-            issue.setStatus(issueStatusUpdatePayload.toStatus());
-            issue.setResolvedBy(developer);
+        else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.fromStatus())) {
+            if(IssueStatus.PENDING.equals(issueStatusUpdatePayload.toStatus()) ||
+                    IssueStatus.INPROGRESS.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setAssignedTo(developer);
+                issue.setRejectedBy(null);
+            }
+            else if(IssueStatus.COMPLETED.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setResolvedBy(developer);
+                issue.setRejectedBy(null);
+            }
+            else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
+                issue.setStatus(issueStatusUpdatePayload.toStatus());
+                issue.setRejectedBy(developer);
+            }
         }
 
         return issueRepository.save(issue);

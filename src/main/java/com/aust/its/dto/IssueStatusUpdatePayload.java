@@ -6,5 +6,6 @@ public record IssueStatusUpdatePayload(
         Long workedBy,
         IssueStatus fromStatus,
         IssueStatus toStatus,
-        String rejectionReason
+        String rejectionReason,
+        String completedAnalysis
 ) { }
