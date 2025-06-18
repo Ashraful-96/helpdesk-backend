@@ -2,9 +2,7 @@ package com.aust.its.controller;
 
 import com.aust.its.dto.IssuesOfDeveloperDto;
 import com.aust.its.entity.Developer;
-import com.aust.its.entity.User;
 import com.aust.its.service.DeveloperService;
-import com.aust.its.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,14 +59,20 @@ public class IssueService {
             if(IssueStatus.COMPLETED.equals(issue.getStatus())) {
                 if(issue.getResolvedBy() != null) {
                     response.setDeveloperName(issue.getResolvedBy().getUser().getUsername());
+                    response.setCompletedReason(issue.getCompletedReason());
+                    response.setCompletedAt(issue.getCompletedAt());
                 }
             }
             if(IssueStatus.REJECTED.equals(issue.getStatus())) {
                 if(issue.getRejectedBy() != null) {
                     response.setDeveloperName(issue.getRejectedBy().getUser().getUsername());
+                    response.setRejectedReason(issue.getRejectionReason());
+                    response.setRejectedAt(issue.getRejectedAt());
                 }
                 else {
                     response.setDeveloperName(issue.getRejectedByAdmin());
+                    response.setRejectedReason(issue.getRejectionReason());
+                    response.setRejectedAt(issue.getRejectedAt());
                 }
             }
 
@@ -105,6 +112,7 @@ public class IssueService {
                 .orElseThrow(() -> new RuntimeException("Issue not found with ID: " + issueId));
 
         issue.setStatus(IssueStatus.REJECTED);
+        issue.setRejectedAt(LocalDateTime.now());
         issue.setRejectionReason(issueRejectPayload.rejectionReason());
 
         if(Role.ADMIN.getName().equalsIgnoreCase(issueRejectPayload.rejectedByRole())) {
@@ -147,11 +155,15 @@ public class IssueService {
                 issue.setStatus(issueStatusUpdatePayload.toStatus());
                 issue.setAssignedTo(null);
                 issue.setResolvedBy(developer);
+                issue.setCompletedAt(LocalDateTime.now());
+                issue.setCompletedReason(issueStatusUpdatePayload.completedAnalysis());
             }
             else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
                 issue.setStatus(issueStatusUpdatePayload.toStatus());
                 issue.setAssignedTo(null);
                 issue.setRejectedBy(developer);
+                issue.setRejectedAt(LocalDateTime.now());
+                issue.setRejectionReason(issueStatusUpdatePayload.rejectionReason());
             }
         }
         else if(IssueStatus.COMPLETED.equals(issueStatusUpdatePayload.fromStatus())) {
@@ -165,11 +177,15 @@ public class IssueService {
                 issue.setStatus(issueStatusUpdatePayload.toStatus());
                 issue.setAssignedTo(null);
                 issue.setResolvedBy(developer);
+                issue.setCompletedAt(LocalDateTime.now());
+                issue.setCompletedReason(issueStatusUpdatePayload.completedAnalysis());
             }
             else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
                 issue.setStatus(issueStatusUpdatePayload.toStatus());
                 issue.setResolvedBy(null);
                 issue.setRejectedBy(developer);
+                issue.setRejectedAt(LocalDateTime.now());
+                issue.setRejectionReason(issueStatusUpdatePayload.rejectionReason());
             }
         }
         else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.fromStatus())) {
@@ -183,10 +199,14 @@ public class IssueService {
                 issue.setStatus(issueStatusUpdatePayload.toStatus());
                 issue.setResolvedBy(developer);
                 issue.setRejectedBy(null);
+                issue.setCompletedAt(LocalDateTime.now());
+                issue.setCompletedReason(issueStatusUpdatePayload.completedAnalysis());
             }
             else if(IssueStatus.REJECTED.equals(issueStatusUpdatePayload.toStatus())) {
                 issue.setStatus(issueStatusUpdatePayload.toStatus());
                 issue.setRejectedBy(developer);
+                issue.setRejectedAt(LocalDateTime.now());
+                issue.setRejectionReason(issueStatusUpdatePayload.rejectionReason());
             }
         }
 

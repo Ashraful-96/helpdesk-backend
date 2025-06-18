@@ -139,6 +139,7 @@ public class DeveloperService {
                             .serialId(issue.getSerialId())
                             .createdAt(issue.getCreatedAt())
                             .completedAt(issue.getCompletedAt())
+                            .completedReason(issue.getCompletedReason())
                             .build();
 
             DeveloperSpecificIssueDto developerSpecificIssueDto =
@@ -172,6 +173,8 @@ public class DeveloperService {
                             .description(issue.getDescription())
                             .serialId(issue.getSerialId())
                             .createdAt(issue.getCreatedAt())
+                            .rejectedAt(issue.getRejectedAt())
+                            .rejectionReason(issue.getRejectionReason())
                             .build();
 
             DeveloperSpecificIssueDto developerSpecificIssueDto =

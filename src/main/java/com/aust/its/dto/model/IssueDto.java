@@ -13,5 +13,8 @@ public record IssueDto(
         IssueStatus status,
         String serialId,
         LocalDateTime createdAt,
-        LocalDateTime completedAt
+        LocalDateTime completedAt,
+        LocalDateTime rejectedAt,
+        String completedReason,
+        String rejectionReason
 ) { }

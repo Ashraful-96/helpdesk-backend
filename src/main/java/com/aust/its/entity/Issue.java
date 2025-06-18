@@ -28,6 +28,7 @@ public class Issue {
     private IssueStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
+    private LocalDateTime rejectedAt;
     private String serialId; // it will assigned by admin when the issue is assigned to developer
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -50,4 +51,5 @@ public class Issue {
 
     private String rejectedByAdmin;
     private String rejectionReason;
+    private String completedReason;
 }

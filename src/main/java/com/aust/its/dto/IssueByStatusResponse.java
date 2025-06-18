@@ -19,6 +19,9 @@ public class IssueByStatusResponse {
     IssueStatus status;
     LocalDateTime createdAt;
     LocalDateTime completedAt;
+    LocalDateTime rejectedAt;
     String serialId;
     String developerName;
+    String completedReason;
+    String rejectedReason;
 }
