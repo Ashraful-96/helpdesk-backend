@@ -6,6 +6,7 @@ import com.aust.its.service.DeveloperService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +21,10 @@ public class DeveloperController {
 
     private final DeveloperService developerService;
 
+    @PreAuthorize("hasRole('Admin') || hasRole('Developer')")
     @GetMapping
     public List<Developer> getDevelopers() {
+        logger.info("getDevelopers from controller");
         return developerService.getAll();
     }
 
