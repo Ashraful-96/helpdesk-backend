@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "issues")
@@ -52,4 +53,13 @@ public class Issue {
     private String rejectedByAdmin;
     private String rejectionReason;
     private String completedReason;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "issue_category",
+            joinColumns = @JoinColumn(name = "issue_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
 }

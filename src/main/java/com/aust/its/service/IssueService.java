@@ -1,11 +1,17 @@
 package com.aust.its.service;
 
 import com.aust.its.dto.*;
+import com.aust.its.dto.model.IssueDto;
+import com.aust.its.dto.model.UserDto;
+import com.aust.its.entity.Category;
 import com.aust.its.entity.Developer;
 import com.aust.its.entity.Issue;
 import com.aust.its.entity.User;
 import com.aust.its.enums.IssueStatus;
 import com.aust.its.enums.Role;
+import com.aust.its.mapper.CategoryMapper;
+import com.aust.its.mapper.IssueMapper;
+import com.aust.its.mapper.UserMapper;
 import com.aust.its.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -231,5 +239,32 @@ public class IssueService {
         }
 
         return issueRepository.save(issue);
+    }
+
+    public IssueDto getIssueResponse(Issue issuePayload) {
+        Issue issue = issueRepository.save(issuePayload);
+        User user = issue.getUser();
+        List<Category> categories = issue.getCategories();
+        return IssueMapper.entityToDto(issue, user, categories);
+    }
+
+    public List<IssueCountDto> getAllIssueCount() {
+        List<Issue> issues = issueRepository.findAll();
+        Map<IssueStatus, Long> issueCountMap = new HashMap<>();
+
+        for (Issue issue : issues) {
+            issueCountMap.merge(issue.getStatus(), 1L, Long::sum);
+        }
+
+        return issueCountMap.entrySet()
+                .stream()
+                .map(e -> new IssueCountDto(e.getKey(), e.getValue()))
+                .toList();
+    }
+
+    public IssueCountDto getIssueCountByStatus(IssueStatus issueStatus) {
+        List<Issue> issues = issueRepository.findAll();
+        long count = issues.stream().filter(i -> i.getStatus().equals(issueStatus)).count();
+        return new IssueCountDto(issueStatus, count);
     }
 }

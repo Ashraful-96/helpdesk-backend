@@ -1,6 +1,5 @@
 package com.aust.its.config.security;
 
-import com.aust.its.aspect.AuthorizedUserAspect;
 import com.aust.its.dto.token.JwtUsrInfo;
 import com.aust.its.service.AuthenticationService;
 import com.aust.its.utils.Const;
