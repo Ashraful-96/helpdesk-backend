@@ -1,11 +1,13 @@
 package com.aust.its.controller;
 
 import com.aust.its.dto.*;
+import com.aust.its.dto.model.IssueDto;
+import com.aust.its.entity.Category;
 import com.aust.its.entity.Issue;
 import com.aust.its.entity.User;
 import com.aust.its.enums.IssueStatus;
 import com.aust.its.mapper.IssueMapper;
-import com.aust.its.repository.IssueRepository;
+import com.aust.its.service.CategoryService;
 import com.aust.its.service.IssueService;
 import com.aust.its.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +25,18 @@ public class IssueController {
 
     private static final Logger logger = LoggerFactory.getLogger(IssueController.class);
 
-    private final IssueRepository repository;
     private final IssueService issueService;
     private final UserService userService;
+    private final CategoryService categoryService;
 
     @PostMapping
-    public Issue submitIssue(@RequestBody IssuePayload issuePayload) {
+    public IssueDto submitIssue(@RequestBody IssuePayload issuePayload) {
         logger.info("Issue Payload :: {}", issuePayload);
 
         User user = userService.getById(issuePayload.userId());
-        Issue issue = IssueMapper.payloadToEntity(issuePayload, user);
-        return repository.save(issue);
+        List<Category> categories = categoryService.getCategoriesByCategoryIdList(issuePayload.categoryIds());
+        Issue issue = IssueMapper.payloadToEntity(issuePayload, user, categories);
+        return issueService.getIssueResponse(issue);
     }
 
     @GetMapping("/user/{id}")
@@ -73,5 +76,15 @@ public class IssueController {
     public Issue updateAssignee(@PathVariable("id") Long issueId,
                                 @RequestBody AssignDeveloperPayload assignDeveloperPayload) {
         return issueService.updateAssignee(issueId, assignDeveloperPayload.developerId());
+    }
+
+    @GetMapping("/count")
+    public List<IssueCountDto> getIssueCount() {
+        return issueService.getAllIssueCount();
+    }
+
+    @GetMapping("/{status}/count")
+    public IssueCountDto getIssueCountByStatus(@PathVariable("status") IssueStatus issueStatus) {
+        return issueService.getIssueCountByStatus(issueStatus);
     }
 }

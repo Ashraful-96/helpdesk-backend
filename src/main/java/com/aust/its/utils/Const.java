@@ -1,10 +1,8 @@
 package com.aust.its.utils;
 
-import javax.crypto.SecretKey;
-
-import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
 public class Const {

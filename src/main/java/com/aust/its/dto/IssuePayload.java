@@ -1,7 +1,10 @@
 package com.aust.its.dto;
 
+import java.util.List;
+
 public record IssuePayload(
     String description,
     String title,
-    long userId
+    long userId,
+    List<Long> categoryIds
 ) { }
