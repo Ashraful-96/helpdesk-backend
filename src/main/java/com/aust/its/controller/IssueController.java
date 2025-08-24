@@ -52,7 +52,7 @@ public class IssueController {
     }
 
     @GetMapping("/user/{id}")
-    public List<Issue> getIssues(@PathVariable("id") Long userId,
+    public List<Issue> getIssues(@PathVariable("id") String userId,
                                  @RequestParam IssueStatus status) {
 
         logger.info("finding issues of userId :: {} for status :: {}", userId, status);
@@ -106,7 +106,7 @@ public class IssueController {
     public ResponseEntity<?> createIssueWithFiles(
             @RequestParam("title") String title,
             @RequestParam("description") String description,
-            @RequestParam("userId") Long userId,
+            @RequestParam("userId") String userId,
             @RequestParam("category") String category,
             @RequestParam(value = "files", required = false) List<MultipartFile> files
     ) {

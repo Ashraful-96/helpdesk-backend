@@ -37,9 +37,9 @@ public class AuthorizedUserAspect {
 
         if (token != null) {
             JwtUsrInfo jwtUsrInfo = authenticationService.extractJwtUserInfo(token);
-            String adminUserId = jwtUsrInfo.adminUsrId();
+//            String adminUserId = jwtUsrInfo.adminUsrId();
 
-            logger.info("AdminUsrId :: {}", adminUserId);
+//            logger.info("AdminUsrId :: {}", adminUserId);
         }
     }
 }

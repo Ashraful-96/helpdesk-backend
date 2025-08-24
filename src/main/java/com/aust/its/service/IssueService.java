@@ -34,7 +34,7 @@ public class IssueService {
     private final UserService userService;
     private final DeveloperService developerService;
 
-    public List<Issue> getIssuesByUserIdAndStatus(Long userId, IssueStatus status) {
+    public List<Issue> getIssuesByUserIdAndStatus(String userId, IssueStatus status) {
         List<Issue> issues = issueRepository.findByUserIdAndStatus(userId, status);
         logger.info("issues by userId and status : {}", issues);
         return issues;
@@ -124,7 +124,7 @@ public class IssueService {
         issue.setRejectionReason(issueRejectPayload.rejectionReason());
 
         if(Role.ADMIN.getName().equalsIgnoreCase(issueRejectPayload.rejectedByRole())) {
-            user = userService.getById(issueRejectPayload.rejectedById());
+            user = userService.getById(String.valueOf(issueRejectPayload.rejectedById()));
             issue.setRejectedByAdmin(user.getUsername());
         }
         else if(Role.DEVELOPER.getName().equalsIgnoreCase(issueRejectPayload.rejectedByRole())) {
@@ -269,7 +269,7 @@ public class IssueService {
     }
 
     //code for the file
-    public Issue createIssueWithFiles(String title, String description, Long userId, String category, List<String> uploadedFilenames) {
+    public Issue createIssueWithFiles(String title, String description, String userId, String category, List<String> uploadedFilenames) {
         // Get user
         User user = userService.getById(userId);
 

@@ -199,7 +199,7 @@ public class DeveloperService {
                 .build();
     }
 
-    public Developer getByUserId(Long userId) {
+    public Developer getByUserId(String userId) {
         User user = userService.getById(userId);
         return developerRepository.findByUser(user);
     }

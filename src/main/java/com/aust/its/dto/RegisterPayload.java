@@ -1,6 +1,6 @@
 package com.aust.its.dto;
 
-public record LoginPayload(
+public record RegisterPayload(
     String userId,
     String password
 ) { }

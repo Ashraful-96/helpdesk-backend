@@ -17,6 +17,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -57,11 +59,16 @@ public class SecurityConfig {
                 JwtUsrInfo jwtUsrInfo = authenticationService.extractJwtUserInfo(token);
 
                 var authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                        jwtUsrInfo.username(), null, List.of(new SimpleGrantedAuthority("ROLE_".concat(jwtUsrInfo.role()))));
+                        jwtUsrInfo.usrId(), null, List.of(new SimpleGrantedAuthority("ROLE_".concat(jwtUsrInfo.role()))));
                 org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
             filterChain.doFilter(request, response);
         }
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

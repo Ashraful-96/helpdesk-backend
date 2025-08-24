@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface IssueRepository extends JpaRepository<Issue, Long> {
 
-    List<Issue> findByUserIdAndStatus(Long userId, IssueStatus status);
+    List<Issue> findByUserIdAndStatus(String userId, IssueStatus status);
     List<Issue> findByStatus(IssueStatus status);
 }

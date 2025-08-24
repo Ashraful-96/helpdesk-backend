@@ -28,7 +28,7 @@ public class DeveloperController {
     }
 
     @GetMapping("{id}/issues")
-    public IssuesOfDeveloperDto getIssuesOfDeveloper(@PathVariable("id") Long userId) {
+    public IssuesOfDeveloperDto getIssuesOfDeveloper(@PathVariable("id") String userId) {
         Developer developer = developerService.getByUserId(userId);
         logger.info("Finding issues of developer : {}", developer.getId());
 

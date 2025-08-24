@@ -5,6 +5,6 @@ import java.util.List;
 public record IssuePayload(
     String description,
     String title,
-    long userId,
+    String userId,
     List<Long> categoryIds
 ) { }

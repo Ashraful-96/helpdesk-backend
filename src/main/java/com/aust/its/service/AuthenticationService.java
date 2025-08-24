@@ -20,7 +20,7 @@ public class AuthenticationService {
             String userInfoJson = objectMapper.writeValueAsString(jwtUsrInfo);
 
             return Jwts.builder()
-                    .setSubject(jwtUsrInfo.username())
+                    .setSubject(jwtUsrInfo.usrId())
                     .claim("userInfo", userInfoJson)
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + Const.Jwt.expirationMillis))
