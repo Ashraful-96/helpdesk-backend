@@ -6,7 +6,7 @@ import com.aust.its.entity.Category;
 public class CategoryMapper {
 
     public static CategoryDto entityToDto(Category category) {
-        return new CategoryDto(category.getId(), category.getCategoryName());
+        return new CategoryDto(category.getCategoryName());
     }
 
     public static Category dtoToEntity(CategoryDto dto) {

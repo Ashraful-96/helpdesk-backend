@@ -6,6 +6,7 @@ import com.aust.its.mapper.CategoryMapper;
 import com.aust.its.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class CategoryService {
         return null;
     }
 
+    @Transactional
     public CategoryDto create(CategoryDto categoryDto) {
         Category category = categoryRepository.save(CategoryMapper.dtoToEntity(categoryDto));
         return CategoryMapper.entityToDto(category);

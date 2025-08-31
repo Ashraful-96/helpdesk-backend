@@ -16,7 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final HelpDeskUserService helpDeskUserService;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder customPasswordEncoder;
 
     public User getById(String userId) {
         return userRepository.findById(userId).orElse(null);
@@ -32,7 +32,7 @@ public class UserService {
             if(helpDeskUser == null) {
                 HelpDeskUser helpDeskUser1 = new HelpDeskUser();
                 helpDeskUser1.setUserId(payload.userId());
-                helpDeskUser1.setPassword(passwordEncoder.encode(payload.password()));
+                helpDeskUser1.setPassword(customPasswordEncoder.encode(payload.password()));
 
                 if(user.getEmployeeId() != null) {
                     helpDeskUser1.setRoleId(13000);

@@ -1,5 +1,7 @@
 package com.aust.its.controller;
 
+import com.aust.its.config.security.CustomUserDetailsService;
+import com.aust.its.dto.AuthenticationResponse;
 import com.aust.its.dto.LoginPayload;
 import com.aust.its.dto.RegisterPayload;
 import com.aust.its.dto.token.JwtUsrInfo;
@@ -11,9 +13,16 @@ import com.aust.its.service.AuthenticationService;
 import com.aust.its.service.HelpDeskRoleService;
 import com.aust.its.service.HelpDeskUserService;
 import com.aust.its.service.UserService;
+import com.aust.its.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -29,6 +38,9 @@ public class LoginController {
     private final AuthenticationService authenticationService;
     private final HelpDeskUserService helpDeskUserService;
     private final HelpDeskRoleService helpDeskRoleService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService customUserDetailsService;
 
 //    @PostMapping("/login")
 //    public User login(@RequestBody LoginPayload loginPayload) {
@@ -63,17 +75,21 @@ public class LoginController {
 //    }
 
     @PostMapping("/authenticate")
-    public String authenticate(@RequestBody LoginPayload loginPayload) {
+    public ResponseEntity<?> authenticate(@RequestBody LoginPayload loginPayload) throws Exception {
         logger.info("login payload is : {}", loginPayload);
 
-        HelpDeskUser user = helpDeskUserService.getHelpDeskUserByIdAndPassword(loginPayload.userId(), loginPayload.password());
-        HelpDeskRole role = helpDeskRoleService.getHelpDeskRoleById(user.getRoleId());
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginPayload.userId(), loginPayload.password())
+            );
+        } catch(BadCredentialsException e) {
+            throw new Exception("Incorrect Username or password" , e);
+        }
 
-        JwtUsrInfo jwtUsrInfo = JwtUsrInfo.of(user.getUserId(), role.getRoleLabel());
-        String jwt = authenticationService.generateToken(jwtUsrInfo);
-        logger.info("Jwt Token is : {}", jwt);
+        final UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginPayload.userId());
+        final String jwt = JwtUtils.generateToken(userDetails);
 
-        return jwt;
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, null));
     }
 
     @PostMapping("/register")

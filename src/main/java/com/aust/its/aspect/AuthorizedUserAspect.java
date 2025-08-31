@@ -2,6 +2,7 @@ package com.aust.its.aspect;
 
 import com.aust.its.dto.token.JwtUsrInfo;
 import com.aust.its.service.AuthenticationService;
+import com.aust.its.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
@@ -21,7 +22,7 @@ public class AuthorizedUserAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthorizedUserAspect.class);
 
-    private final AuthenticationService authenticationService;
+//    private final AuthenticationService authenticationService;
 
     @Before("@annotation(com.aust.its.annotation.IsAuthorizedPerson)")
     public void checkIfAuthorizedUser() {
@@ -36,7 +37,7 @@ public class AuthorizedUserAspect {
                 .orElse(null);
 
         if (token != null) {
-            JwtUsrInfo jwtUsrInfo = authenticationService.extractJwtUserInfo(token);
+            JwtUsrInfo jwtUsrInfo = JwtUtils.extractJwtUserInfo(token);
 //            String adminUserId = jwtUsrInfo.adminUsrId();
 
 //            logger.info("AdminUsrId :: {}", adminUserId);

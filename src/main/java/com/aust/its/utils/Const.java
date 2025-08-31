@@ -36,7 +36,7 @@ public class Const {
 
 
     public static class Jwt {
-        public static final String SECRET = "secretsdfsdsdvsdgsdvsdgsecretsdfsdsdvsdgsdvsdg";
+        public static final String SECRET = "mysupersecretkeymysupersecretkey123456";
 
         public static final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 //        public static final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
