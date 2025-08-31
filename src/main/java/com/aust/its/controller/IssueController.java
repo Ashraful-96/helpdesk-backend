@@ -118,7 +118,6 @@ public class IssueController {
                     String originalFilename = file.getOriginalFilename();
                     if (originalFilename == null || originalFilename.isBlank()) continue;
 
-                    // ✅ Fixed File Save Location
                     String uploadDir = "D:/iums_images/" + userId;
                     File dir = new File(uploadDir);
                     if (!dir.exists()) dir.mkdirs();
@@ -126,7 +125,7 @@ public class IssueController {
                     File dest = new File(uploadDir + "/" + originalFilename);
                     file.transferTo(dest);
 
-                    savedFileNames.add(originalFilename); // ✅ Save only filename
+                    savedFileNames.add(originalFilename);
                 }
             }
 
@@ -154,10 +153,9 @@ public class IssueController {
                 return ResponseEntity.notFound().build();
             }
 
-            // 🔍 Detect the MIME type
             String mimeType = Files.probeContentType(path);
             if (mimeType == null) {
-                mimeType = "application/octet-stream"; // Fallback
+                mimeType = "application/octet-stream";
             }
 
             return ResponseEntity.ok()

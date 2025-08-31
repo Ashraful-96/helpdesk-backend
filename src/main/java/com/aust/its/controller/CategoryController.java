@@ -46,5 +46,4 @@ public class CategoryController {
         }
         return "Deleted";
     }
-
 }

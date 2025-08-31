@@ -35,9 +35,7 @@ public class IssueService {
     private final DeveloperService developerService;
 
     public List<Issue> getIssuesByUserIdAndStatus(String userId, IssueStatus status) {
-        List<Issue> issues = issueRepository.findByUserIdAndStatus(userId, status);
-        logger.info("issues by userId and status : {}", issues);
-        return issues;
+        return issueRepository.findByUserIdAndStatus(userId, status);
     }
 
     public List<IssueByStatusResponse> getIssuesByStatus(IssueStatus status) {
@@ -87,7 +85,6 @@ public class IssueService {
             responses.add(response);
         }
 
-        logger.info("issues by status : {}", issues);
         return responses;
     }
 
@@ -279,13 +276,10 @@ public class IssueService {
         issue.setDescription(description);
         issue.setUser(user);
         issue.setStatus(IssueStatus.PENDING);
-
-
         issue.setCreatedAt(LocalDateTime.now());
 
-        Issue savedIssue = issueRepository.save(issue); // Save to get issue ID
+        Issue savedIssue = issueRepository.save(issue);
 
-        // Map each filename to an IssueFile entity
         List<IssueFile> issueFiles = uploadedFilenames.stream()
                 .map(fileName -> IssueFile.builder()
                         .fileName(fileName)
@@ -294,9 +288,8 @@ public class IssueService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Save file metadata to DB
-        issueFileRepository.saveAll(issueFiles);
 
+        issueFileRepository.saveAll(issueFiles);
         return savedIssue;
     }
 

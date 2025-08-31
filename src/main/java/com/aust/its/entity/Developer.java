@@ -10,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "developers")
-//@Data
 @Getter
 @Setter
 public class Developer {

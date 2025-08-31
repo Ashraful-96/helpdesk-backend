@@ -53,5 +53,4 @@ public class CategoryService {
     public List<Category> getCategoriesByCategoryIdList(List<Long> categoryIdList) {
         return categoryRepository.findAllById(categoryIdList);
     }
-
 }

@@ -19,7 +19,6 @@ public class Const {
             "/api/authenticate",
             "/api/register",
 
-
             // Swagger & Actuator
             "/swagger-ui.html",
             "/swagger-ui/**",
@@ -36,10 +35,10 @@ public class Const {
 
 
     public static class Jwt {
-        public static final String SECRET = "mysupersecretkeymysupersecretkey123456";
+        public static final String SECRET = "mysupersecretkeymysupersecretkey158752";
 
         public static final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-//        public static final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        public static final long expirationMillis = 1000 * 60 * 60; // 1 hour
+        public static final long ACCESS_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 1; // 5 minutes
+        public static final long REFRESH_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 7; // 7 minutes
     }
 }

@@ -45,27 +45,7 @@ public class UserService {
             return helpDeskUser;
         }
 
-        // throw exception :: you are not an IUMS user
+        // TODO : throw exception :: you are not an IUMS user
         return null;
     }
-
-//    public User getByUsernameAndPassword(String username, String password) {
-//        User user = userRepository.findByUsername(username).orElse(null);
-//
-//        if(user == null) {
-//            throw new RuntimeException("User not found");
-//        }
-//
-//        if(user.getPassword() == null) {
-//            throw new RuntimeException("You are new to the system, you can register now");
-//        }
-//
-//        user = userRepository.findByUsernameAndPassword(username, password).orElse(null);
-//
-//        if(user == null) {
-//            throw new RuntimeException("Username and password mismatched");
-//        }
-//
-//        return user;
-//    }
 }

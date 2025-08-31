@@ -29,7 +29,6 @@ public class DeveloperService {
 
     @IsAuthorizedPerson
     public List<Developer> getAll() {
-        logger.info("Executing the findAll method for getting all the developers");
         return developerRepository.findAll();
     }
 

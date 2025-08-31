@@ -21,8 +21,6 @@ public class AuthorizedUserAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthorizedUserAspect.class);
 
-//    private final AuthenticationService authenticationService;
-
     @Before("@annotation(com.aust.its.annotation.IsAuthorizedPerson)")
     public void checkIfAuthorizedUser() {
 

@@ -27,6 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         Optional<HelpDeskRole> role = helpDeskRoleRepository.findById(user.get().getRoleId());
-        return new CustomUserDetails(user.get(), role.get());
+        return new CustomUserDetails(user.get(), role.orElse(null));
     }
 }

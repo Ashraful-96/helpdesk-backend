@@ -25,5 +25,4 @@ public class IssueFile {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
 }
