@@ -2,7 +2,6 @@ package com.aust.its.service;
 
 import com.aust.its.entity.HelpDeskUser;
 import com.aust.its.repository.HelpDeskUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

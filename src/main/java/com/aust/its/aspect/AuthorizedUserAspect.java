@@ -1,7 +1,6 @@
 package com.aust.its.aspect;
 
 import com.aust.its.dto.token.JwtUsrInfo;
-import com.aust.its.service.AuthenticationService;
 import com.aust.its.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
