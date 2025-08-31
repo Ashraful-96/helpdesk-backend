@@ -35,10 +35,10 @@ public class Const {
 
 
     public static class Jwt {
-        public static final String SECRET = "mysupersecretkeymysupersecretkey158752";
+        public static final String SECRET = "this-is-a-very-long-secret-key-32bytes-minimum!!89541237";
 
         public static final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-        public static final long ACCESS_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 1; // 5 minutes
+        public static final long ACCESS_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 5; // 5 minutes
         public static final long REFRESH_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 7; // 7 minutes
     }
 }

@@ -62,6 +62,7 @@ public class JwtUtils {
 
     public static String generateToken(UserDetails userDetails, long expirationMilliseconds) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities());
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
