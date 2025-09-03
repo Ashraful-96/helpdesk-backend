@@ -11,13 +11,11 @@ public class Const {
     public static final String ROLE_AUST_EDU = "ROLE_AUST_EDU";
 
     public static final String[] WHITE_LIST = {
-            "/api/v1/auth/**",
             "/v2/api-docs",
-            "/api/auth/**",
-            "/api/test/**",
-            "/authenticate",
-            "/api/authenticate",
-            "/api/register",
+            "/api/auth/login",
+            "/api/auth/register",
+            "/api/password/forget",
+            "/api/password/change",
 
             // Swagger & Actuator
             "/swagger-ui.html",
