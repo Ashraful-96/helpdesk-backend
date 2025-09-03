@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -33,7 +33,7 @@ public class AuthController {
     private final CustomUserDetailsService customUserDetailsService;
 
 
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody LoginPayload loginPayload) throws Exception {
         logger.info("login payload is : {}", loginPayload);
 

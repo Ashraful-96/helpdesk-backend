@@ -1,0 +1,15 @@
+hazelcast:
+  cluster-name: password-reset-cluster
+  network:
+    join:
+      multicast:
+        enabled: false
+      tcp-ip:
+        enabled: true
+        member-list:
+          - 127.0.0.1:5701
+#          - 127.0.0.1:5702
+  map:
+    userTokens:
+      time-to-live-seconds: 60   # token TTL = 1 minute
+      backup-count: 1            # replication count
