@@ -172,7 +172,7 @@ public class IssueController {
     public ResponseEntity<PagedResponse<IssueResponseDto>> getAllIssues(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam IssueStatus status) {
+            @RequestParam(required = false) IssueStatus status) {
         return ResponseEntity.ok(issueService.getAllIssues(page, size, status));
     }
 }
