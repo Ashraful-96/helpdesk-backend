@@ -25,27 +25,26 @@ public class UserService {
     public HelpDeskUser register(RegisterPayload payload) {
         Optional<User> userOptional = userRepository.findById(payload.userId());
         if (userOptional.isPresent()) {
-
             HelpDeskUser helpDeskUser = helpDeskUserService.getHelpDeskUserByUserId(payload.userId());
             User user = userOptional.get();
 
             if(helpDeskUser == null) {
-                HelpDeskUser helpDeskUser1 = new HelpDeskUser();
-                helpDeskUser1.setUserId(payload.userId());
-                helpDeskUser1.setPassword(customPasswordEncoder.encode(payload.password()));
+                HelpDeskUser helpDeskUserToSave = new HelpDeskUser();
+                helpDeskUserToSave.setUserId(payload.userId());
+                helpDeskUserToSave.setEmail(payload.email());
+                helpDeskUserToSave.setPassword(customPasswordEncoder.encode(payload.password()));
 
                 if(user.getEmployeeId() != null) {
-                    helpDeskUser1.setRoleId(13000);
+                    helpDeskUserToSave.setRoleId(13000);
                 } else {
-                    helpDeskUser1.setRoleId(13001);
+                    helpDeskUserToSave.setRoleId(13001);
                 }
 
-                return helpDeskUserService.saveHelpDeskUser(helpDeskUser1);
+                return helpDeskUserService.saveHelpDeskUser(helpDeskUserToSave);
             }
             return helpDeskUser;
         }
 
-        // TODO : throw exception :: you are not an IUMS user
-        return null;
+        throw new RuntimeException("you are not an IUMS user");
     }
 }

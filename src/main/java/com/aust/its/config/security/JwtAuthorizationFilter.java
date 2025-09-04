@@ -36,9 +36,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            logger.info("** Username found in token **");
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            if(JwtUtils.validateToken(jwtToken, userDetails)) {
+            if(JwtUtils.validateToken(username, jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

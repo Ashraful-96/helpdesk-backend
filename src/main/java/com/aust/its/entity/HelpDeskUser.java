@@ -1,5 +1,6 @@
 package com.aust.its.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,9 +16,14 @@ public class HelpDeskUser {
     @Column(name = "USER_ID")
     private String userId;
 
+    @JsonIgnore
     @Column(name = "PASSWORD")
     private String password;
 
+    @Column(name = "EMAIL_ADDRESS")
+    private String email;
+
+    @JsonIgnore
     @Column(name = "ROLE_ID")
     private long roleId;
 }

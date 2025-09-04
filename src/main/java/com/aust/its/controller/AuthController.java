@@ -10,6 +10,7 @@ import com.aust.its.service.UserService;
 import com.aust.its.utils.Const;
 import com.aust.its.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterPayload registerPayload) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterPayload registerPayload) {
         HelpDeskUser user = userService.register(registerPayload);
         return ResponseEntity.ok(new RegisterResponse(user.getUserId(), user.getRoleId()));
     }

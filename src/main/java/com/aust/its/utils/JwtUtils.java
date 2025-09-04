@@ -80,8 +80,7 @@ public class JwtUtils {
         return extractExpiration(token).before(new Date());
     }
 
-    public static Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+    public static Boolean validateToken(String username, String token, UserDetails userDetails) {
         return (username.equals(userDetails.getUsername()) && validateToken(token));
     }
 }
