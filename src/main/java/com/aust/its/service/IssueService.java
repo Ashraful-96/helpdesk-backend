@@ -2,15 +2,21 @@ package com.aust.its.service;
 
 import com.aust.its.dto.*;
 import com.aust.its.dto.model.IssueDto;
+import com.aust.its.dto.pagination.PagedResponse;
 import com.aust.its.entity.*;
 import com.aust.its.enums.IssueStatus;
 import com.aust.its.enums.Role;
+import com.aust.its.mapper.CategoryMapper;
 import com.aust.its.mapper.IssueMapper;
 import com.aust.its.repository.IssueFileRepository;
 import com.aust.its.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -304,5 +310,44 @@ public class IssueService {
         File savedFile = new File(dir, originalFilename);
         java.nio.file.Files.write(savedFile.toPath(), fileBytes);
         return originalFilename; // Return saved file name
+    }
+
+
+    public PagedResponse<IssueResponseDto> getAllIssues(int page, int size, IssueStatus status) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Issue> issuePage;
+
+        if (status != null) {
+            issuePage = issueRepository.findByStatus(status, pageable);
+        } else {
+            issuePage = issueRepository.findAll(pageable);
+        }
+
+        List<IssueResponseDto> issueList = issuePage.getContent().stream().map(issue ->
+                IssueResponseDto.builder()
+                        .id(issue.getId())
+                        .title(issue.getTitle())
+                        .description(issue.getDescription())
+                        .username(issue.getUser().getUsername())
+                        .status(issue.getStatus().name())
+                        .createdAt(issue.getCreatedAt())
+                        .completedAt(issue.getCompletedAt())
+                        .rejectedAt(issue.getRejectedAt())
+                        .serialId(issue.getSerialId())
+                        .assignedTo(issue.getAssignedTo() != null ? issue.getAssignedTo().getUser().getUsername() : null)
+                        .resolvedBy(issue.getResolvedBy() != null ? issue.getResolvedBy().getUser().getUsername() : null)
+                        .rejectedBy(issue.getRejectedBy() != null ? issue.getRejectedBy().getUser().getUsername() : null)
+                        .categories(CategoryMapper.entityListToDtoList(issue.getCategories()))
+                        .build()
+        ).toList();
+
+        return PagedResponse.<IssueResponseDto>builder()
+                .content(issueList)
+                .pageNumber(issuePage.getNumber())
+                .pageSize(issuePage.getSize())
+                .totalElements(issuePage.getTotalElements())
+                .totalPages(issuePage.getTotalPages())
+                .last(issuePage.isLast())
+                .build();
     }
 }

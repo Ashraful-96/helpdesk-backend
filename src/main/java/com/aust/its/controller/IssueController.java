@@ -2,6 +2,7 @@ package com.aust.its.controller;
 
 import com.aust.its.dto.*;
 import com.aust.its.dto.model.IssueDto;
+import com.aust.its.dto.pagination.PagedResponse;
 import com.aust.its.entity.Category;
 import com.aust.its.entity.Issue;
 import com.aust.its.entity.User;
@@ -165,5 +166,13 @@ public class IssueController {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedResponse<IssueResponseDto>> getAllIssues(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam IssueStatus status) {
+        return ResponseEntity.ok(issueService.getAllIssues(page, size, status));
     }
 }
