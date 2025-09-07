@@ -13,8 +13,8 @@ public class HelpDeskUserService {
         this.helpDeskUserRepository = helpDeskUserRepository;
     }
 
-    public HelpDeskUser getHelpDeskUserByUserId(String userId) {
-        return helpDeskUserRepository.findHelpDeskUserByUserId(userId).orElse(null);
+    public boolean isHelpDeskUserAlreadyExists(String userId) {
+        return helpDeskUserRepository.existsHelpDeskUserByUserId(userId);
     }
 
     public HelpDeskUser saveHelpDeskUser(HelpDeskUser helpDeskUser) {

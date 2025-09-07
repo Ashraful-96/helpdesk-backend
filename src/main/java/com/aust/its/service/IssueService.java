@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -34,11 +35,10 @@ public class IssueService {
     private static final Logger logger = LoggerFactory.getLogger(IssueService.class);
     private static final String FILE_SAVE_DIRECTORY = "C:/Users/austi/Downloads/iums_images";
     private final IssueFileRepository issueFileRepository;
-
-
     private final IssueRepository issueRepository;
     private final UserService userService;
     private final DeveloperService developerService;
+    private final CategoryService categoryService;
 
     public List<Issue> getIssuesByUserIdAndStatus(String userId, IssueStatus status) {
         return issueRepository.findByUserIdAndStatus(userId, status);
@@ -46,57 +46,44 @@ public class IssueService {
 
     public List<IssueByStatusResponse> getIssuesByStatus(IssueStatus status) {
         List<Issue> issues = issueRepository.findByStatus(status);
-
         List<IssueByStatusResponse> responses = new ArrayList<>();
 
         for (Issue issue : issues) {
-            IssueByStatusResponse response =
-                    IssueByStatusResponse
-                            .builder()
-                            .id(issue.getId())
-                            .title(issue.getTitle())
-                            .description(issue.getDescription())
-                            .user(issue.getUser())
-                            .status(issue.getStatus())
-                            .createdAt(issue.getCreatedAt())
-                            .completedAt(issue.getCompletedAt())
-                            .serialId(issue.getSerialId())
-                            .build();
+            try {
+                IssueByStatusResponse response = IssueMapper.getIssueByStatus(issue);
 
-            if(IssueStatus.PENDING.equals(issue.getStatus()) || IssueStatus.INPROGRESS.equals(issue.getStatus())) {
-                if(issue.getAssignedTo() != null) {
-                    response.setDeveloperName(issue.getAssignedTo().getUser().getUsername());
+                if(IssueStatus.PENDING.equals(issue.getStatus()) || IssueStatus.INPROGRESS.equals(issue.getStatus())) {
+                    if(issue.getAssignedTo() != null) {
+                        response.setDeveloperName(issue.getAssignedTo().getUser().getUsername());
+                    }
                 }
-            }
-            if(IssueStatus.COMPLETED.equals(issue.getStatus())) {
-                if(issue.getResolvedBy() != null) {
-                    response.setDeveloperName(issue.getResolvedBy().getUser().getUsername());
-                    response.setCompletedReason(issue.getCompletedReason());
-                    response.setCompletedAt(issue.getCompletedAt());
+                if(IssueStatus.COMPLETED.equals(issue.getStatus())) {
+                    if(issue.getResolvedBy() != null) {
+                        response.setDeveloperName(issue.getResolvedBy().getUser().getUsername());
+                        response.setCompletedReason(issue.getCompletedReason());
+                        response.setCompletedAt(issue.getCompletedAt());
+                    }
                 }
-            }
-            if(IssueStatus.REJECTED.equals(issue.getStatus())) {
-                if(issue.getRejectedBy() != null) {
-                    response.setDeveloperName(issue.getRejectedBy().getUser().getUsername());
+                if(IssueStatus.REJECTED.equals(issue.getStatus())) {
+                    String rejectedBy = issue.getRejectedBy() != null ? issue.getRejectedBy().getUser().getUsername() : issue.getRejectedByAdmin();
+                    response.setDeveloperName(rejectedBy);
                     response.setRejectedReason(issue.getRejectionReason());
                     response.setRejectedAt(issue.getRejectedAt());
                 }
-                else {
-                    response.setDeveloperName(issue.getRejectedByAdmin());
-                    response.setRejectedReason(issue.getRejectionReason());
-                    response.setRejectedAt(issue.getRejectedAt());
-                }
-            }
 
-            responses.add(response);
+                responses.add(response);
+            } catch (Exception e) {
+                logger.error("getIssuesByStatus error :: {}", e.getMessage(), e);
+            }
         }
 
         return responses;
     }
 
+    @Transactional
     public DeveloperAssignedResponse assignIssue(Long issueId, final IssueAssignPayload issueAssignPayload) {
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new RuntimeException("Issue not found with ID: " + issueId));
+                .orElseThrow(() -> new RuntimeException("issue not found with issue id : " + issueId));
 
         Developer developer = developerService.getById(issueAssignPayload.developerId());
         issue.setAssignedTo(developer);
@@ -116,11 +103,12 @@ public class IssueService {
                 .build();
     }
 
+    @Transactional
     public IssueRejectResponse rejectIssue(final Long issueId, final IssueRejectPayload issueRejectPayload) {
         User user = new User();
 
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new RuntimeException("Issue not found with ID: " + issueId));
+                .orElseThrow(() -> new RuntimeException("issue not found with issue id : " + issueId));
 
         issue.setStatus(IssueStatus.REJECTED);
         issue.setRejectedAt(LocalDateTime.now());
@@ -137,7 +125,6 @@ public class IssueService {
         }
 
         Issue savedIssue = issueRepository.save(issue);
-        logger.info("saved issue : {}", savedIssue);
 
         return IssueRejectResponse
                 .builder()
@@ -149,7 +136,7 @@ public class IssueService {
 
     public Issue updateIssueByStatus(Long issueId, IssueStatusUpdatePayload issueStatusUpdatePayload) {
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new RuntimeException("Issue not found with ID: " + issueId));
+                .orElseThrow(() -> new RuntimeException("issue not found with issue id : " + issueId));
 
         User user = userService.getById(issueStatusUpdatePayload.workedBy());
         Developer developer = developerService.getByUserId(user.getId());
@@ -244,7 +231,15 @@ public class IssueService {
         return issueRepository.save(issue);
     }
 
-    public IssueDto getIssueResponse(Issue issuePayload) {
+    @Transactional
+    public IssueDto createIssue(IssuePayload issuePayload) {
+        User user = userService.getById(issuePayload.userId());
+        List<Category> categories = categoryService.getCategoriesByCategoryIdList(issuePayload.categoryIds());
+        Issue issue = IssueMapper.payloadToEntity(issuePayload, user, categories);
+        return getIssueResponse(issue);
+    }
+
+    private IssueDto getIssueResponse(Issue issuePayload) {
         Issue issue = issueRepository.save(issuePayload);
         User user = issue.getUser();
         List<Category> categories = issue.getCategories();

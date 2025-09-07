@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +23,15 @@ public class CategoryService {
     }
 
     public CategoryDto getById(Long id) {
-        Category category = categoryRepository.findById(id).orElse(null);
-        if(category == null) {
-            return null;
-        }
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Category not found"));
         return CategoryMapper.entityToDto(category);
     }
 
     public CategoryDto update(long id, CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(id).orElse(null);
-
-        if(category != null) {
-            category.setCategoryName(categoryDto.categoryName());
-            Category savedCategory = categoryRepository.save(category);
-            return CategoryMapper.entityToDto(savedCategory);
-        }
-        return null;
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Category not found"));
+        category.setCategoryName(categoryDto.categoryName());
+        Category savedCategory = categoryRepository.save(category);
+        return CategoryMapper.entityToDto(savedCategory);
     }
 
     @Transactional

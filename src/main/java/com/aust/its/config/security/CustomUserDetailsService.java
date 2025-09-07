@@ -2,6 +2,7 @@ package com.aust.its.config.security;
 
 import com.aust.its.entity.HelpDeskRole;
 import com.aust.its.entity.HelpDeskUser;
+import com.aust.its.exception.UserNotFoundException;
 import com.aust.its.repository.HelpDeskRoleRepository;
 import com.aust.its.repository.HelpDeskUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<HelpDeskUser> user = helpDeskUserRepository.findHelpDeskUserByUserId(username);
 
         if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UserNotFoundException("user not found");
         }
 
         Optional<HelpDeskRole> role = helpDeskRoleRepository.findById(user.get().getRoleId());

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -14,7 +13,6 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final Logger log = Logger.getLogger(CategoryController.class.getName());
     private final CategoryService categoryService;
 
     @GetMapping
@@ -39,11 +37,7 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     public String deleteCategory(@PathVariable long id) {
-        try {
-            categoryService.delete(id);
-        } catch (Exception e) {
-            log.info("Delete category failed: " + e.getMessage());
-        }
+        categoryService.delete(id);
         return "Deleted";
     }
 }

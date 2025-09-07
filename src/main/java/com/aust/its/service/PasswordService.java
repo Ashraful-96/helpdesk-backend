@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PasswordService {
@@ -60,17 +61,19 @@ public class PasswordService {
             }
 
             TokenData tokenData = cacheService.getToken(userId);
-            if (tokenData != null && tokenData.randomUUID().equalsIgnoreCase(randomNumber)) {
-                return true;
-            } else {
-                return false;
-            }
+            return tokenData != null && tokenData.randomUUID().equalsIgnoreCase(randomNumber);
         } catch (Exception e) {
             return false;
         }
     }
 
-    public void storeToken(String userId, String randomNumber) {
+    public String storeToken(String userId) {
+        String randomNumber = UUID.randomUUID().toString().substring(0, 8);
+        long timestamp = Instant.now().toEpochMilli();
+
+        String data = randomNumber + ":" + timestamp;
+        String encoded = Base64.getEncoder().encodeToString(data.getBytes());
         cacheService.storeToken(userId, randomNumber);
+        return encoded;
     }
 }

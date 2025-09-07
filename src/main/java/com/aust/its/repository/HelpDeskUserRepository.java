@@ -11,4 +11,5 @@ public interface HelpDeskUserRepository extends JpaRepository<HelpDeskUser, Stri
 
     Optional<HelpDeskUser> findHelpDeskUserByUserId(String userId);
     Optional<HelpDeskUser> findHelpDeskUserByUserIdAndPassword(String userId, String password);
+    boolean existsHelpDeskUserByUserId(String userId);
 }

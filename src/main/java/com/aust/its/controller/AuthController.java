@@ -7,6 +7,7 @@ import com.aust.its.dto.RegisterPayload;
 import com.aust.its.dto.RegisterResponse;
 import com.aust.its.entity.HelpDeskUser;
 import com.aust.its.service.UserService;
+import com.aust.its.utils.Commons;
 import com.aust.its.utils.Const;
 import com.aust.its.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,29 +29,25 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService customUserDetailsService;
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody LoginPayload loginPayload) throws Exception {
+    public ResponseEntity<?> authenticate(@RequestBody LoginPayload loginPayload) throws BadCredentialsException {
         logger.info("login payload is : {}", loginPayload);
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginPayload.userId(), loginPayload.password())
-            );
-        } catch(BadCredentialsException e) {
-            throw new Exception("Incorrect Username or password" , e);
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginPayload.userId(), loginPayload.password())
+        );
 
         return authenticationResponse(loginPayload.userId());
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterPayload registerPayload) {
+        logger.info("registration payload is : {}", registerPayload);
         HelpDeskUser user = userService.register(registerPayload);
         return ResponseEntity.ok(new RegisterResponse(user.getUserId(), user.getRoleId()));
     }
@@ -59,17 +56,18 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         final String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            final String token = authorizationHeader.substring(7);
-
-            if(!JwtUtils.validateToken(token)) {
-                return ResponseEntity.badRequest().body("Invalid token");
-            }
-
-            String userId = JwtUtils.extractUsername(token);
-            return authenticationResponse(userId);
+        if(Commons.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+            throw new BadCredentialsException("Invalid Authorization header");
         }
-        return ResponseEntity.badRequest().body("Token missing or invalid format");
+
+        final String token = authorizationHeader.substring(7);
+
+        if(!JwtUtils.validateToken(token)) {
+            throw new BadCredentialsException("Invalid JWT token");
+        }
+
+        String userId = JwtUtils.extractUsername(token);
+        return authenticationResponse(userId);
     }
 
     private ResponseEntity<?> authenticationResponse(String userId) {

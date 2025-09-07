@@ -20,6 +20,7 @@ public class Const {
             // Swagger & Actuator
             "/swagger-ui.html",
             "/swagger-ui/**",
+            "/swagger/**",
             "/v3/api-docs",
             "/v3/api-docs/**",
             "/swagger-resources",
@@ -27,8 +28,8 @@ public class Const {
             "/configuration/ui",
             "/configuration/security",
             "/webjars/**",
-            "/swagger/**",
-            "/actuator/**"
+            "/actuator/**",
+            "/v2/api-docs"
     };
 
 
@@ -38,5 +39,10 @@ public class Const {
         public static final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
         public static final long ACCESS_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 5; // 5 minutes
         public static final long REFRESH_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 7; // 7 minutes
+    }
+
+    public static class token {
+        public static final String VALID_TOKEN = "token is valid";
+        public static final String INVALID_TOKEN = "token is invalid";
     }
 }

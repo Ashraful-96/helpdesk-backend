@@ -17,10 +17,8 @@ import java.util.List;
 public class DeveloperController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeveloperController.class);
-
     private final DeveloperService developerService;
 
-//    @PreAuthorize("hasRole('Admin') || hasRole('Developer')")
     @GetMapping
     public List<Developer> getDevelopers() {
         logger.info("getDevelopers from controller");

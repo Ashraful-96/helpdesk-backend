@@ -1,13 +1,8 @@
 package com.aust.its.controller;
 
 import com.aust.its.dto.*;
-import com.aust.its.dto.model.IssueDto;
-import com.aust.its.dto.pagination.PageResponse;
-import com.aust.its.entity.Category;
 import com.aust.its.entity.Issue;
-import com.aust.its.entity.User;
 import com.aust.its.enums.IssueStatus;
-import com.aust.its.mapper.IssueMapper;
 import com.aust.its.service.CategoryService;
 import com.aust.its.service.IssueService;
 import com.aust.its.service.UserService;
@@ -37,68 +32,63 @@ import java.util.List;
 public class IssueController {
 
     private static final Logger logger = LoggerFactory.getLogger(IssueController.class);
-
     private final IssueService issueService;
     private final UserService userService;
     private final CategoryService categoryService;
 
     @PostMapping
-    public IssueDto submitIssue(@RequestBody IssuePayload issuePayload) {
+    public ResponseEntity<?> submitIssue(@RequestBody IssuePayload issuePayload) {
         logger.info("Issue Payload :: {}", issuePayload);
-
-        User user = userService.getById(issuePayload.userId());
-        List<Category> categories = categoryService.getCategoriesByCategoryIdList(issuePayload.categoryIds());
-        Issue issue = IssueMapper.payloadToEntity(issuePayload, user, categories);
-        return issueService.getIssueResponse(issue);
+        return ResponseEntity.ok(issueService.createIssue(issuePayload));
     }
 
     @GetMapping("/user/{id}")
-    public List<Issue> getIssues(@PathVariable("id") String userId,
+    public ResponseEntity<?> getIssues(@PathVariable("id") String userId,
                                  @RequestParam IssueStatus status) {
 
         logger.info("finding issues of userId :: {} for status :: {}", userId, status);
-        return issueService.getIssuesByUserIdAndStatus(userId, status);
+        return ResponseEntity.ok(issueService.getIssuesByUserIdAndStatus(userId, status));
     }
 
     @GetMapping("/status/{status}")
-    public List<IssueByStatusResponse> getIssuesByStatus(@PathVariable("status") IssueStatus status) {
+    public ResponseEntity<?> getIssuesByStatus(@PathVariable("status") IssueStatus status) {
         logger.info("finding issues of status :: {}", status);
-        return issueService.getIssuesByStatus(status);
+        return ResponseEntity.ok(issueService.getIssuesByStatus(status));
     }
 
     @PostMapping("{id}/assign")
-    public DeveloperAssignedResponse assignIssueToDeveloper(@PathVariable Long id,
+    public ResponseEntity<?> assignIssueToDeveloper(@PathVariable Long id,
                                                             @RequestBody IssueAssignPayload issueAssignPayload) {
         logger.info("Assigning issue {} to developer", id);
-        return issueService.assignIssue(id, issueAssignPayload);
+        return ResponseEntity.ok(issueService.assignIssue(id, issueAssignPayload));
     }
 
     @PostMapping("{id}/reject")
-    public IssueRejectResponse rejectIssue(@PathVariable Long id,
+    public ResponseEntity<?> rejectIssue(@PathVariable Long id,
                                            @RequestBody IssueRejectPayload issueRejectPayload) {
-        return issueService.rejectIssue(id, issueRejectPayload);
+        return ResponseEntity.ok(issueService.rejectIssue(id, issueRejectPayload));
     }
 
     @PutMapping("{id}/status")
-    public Issue updateStatus(@PathVariable Long id,
-                              @RequestBody IssueStatusUpdatePayload issueStatusUpdatePayload) {
-        return issueService.updateIssueByStatus(id, issueStatusUpdatePayload);
+    public ResponseEntity<?> updateStatus(@PathVariable Long id,
+                                              @RequestBody IssueStatusUpdatePayload issueStatusUpdatePayload) {
+        return ResponseEntity.ok(issueService.updateIssueByStatus(id, issueStatusUpdatePayload));
     }
 
     @PutMapping("{id}/assign")
-    public Issue updateAssignee(@PathVariable("id") Long issueId,
-                                @RequestBody AssignDeveloperPayload assignDeveloperPayload) {
-        return issueService.updateAssignee(issueId, assignDeveloperPayload.developerId());
+    public ResponseEntity<?> updateAssignee(@PathVariable("id") Long issueId,
+                                                @RequestBody AssignDeveloperPayload assignDeveloperPayload) {
+        return ResponseEntity.ok(issueService.updateAssignee(issueId, assignDeveloperPayload.developerId()));
     }
 
     @GetMapping("/count")
-    public List<IssueCountDto> getIssueCount() {
-        return issueService.getAllIssueCount();
+    public ResponseEntity<?> getIssueCount() {
+        return ResponseEntity.ok(issueService.getAllIssueCount());
     }
 
     @GetMapping("/{status}/count")
-    public IssueCountDto getIssueCountByStatus(@PathVariable("status") IssueStatus issueStatus) {
-        return issueService.getIssueCountByStatus(issueStatus);
+    public ResponseEntity<?> getIssueCountByStatus(@PathVariable("status") IssueStatus issueStatus) {
+        return ResponseEntity.ok(issueService.getIssueCountByStatus(issueStatus));
     }
 
 
@@ -121,7 +111,9 @@ public class IssueController {
 
                     String uploadDir = "D:/iums_images/" + userId;
                     File dir = new File(uploadDir);
-                    if (!dir.exists()) dir.mkdirs();
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
 
                     File dest = new File(uploadDir + "/" + originalFilename);
                     file.transferTo(dest);
@@ -137,7 +129,7 @@ public class IssueController {
             return ResponseEntity.ok(newIssue);
 
         } catch (Exception e) {
-            e.printStackTrace(); // helpful for debugging
+            logger.error("file exception {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error saving issue: " + e.getMessage());
         }
@@ -169,7 +161,7 @@ public class IssueController {
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<IssueResponseDto>> getAllIssues(
+    public ResponseEntity<?> getAllIssues(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) IssueStatus status) {

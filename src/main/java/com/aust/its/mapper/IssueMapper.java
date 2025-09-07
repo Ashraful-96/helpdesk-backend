@@ -1,6 +1,7 @@
 package com.aust.its.mapper;
 
 import com.aust.its.dto.CategoryDto;
+import com.aust.its.dto.IssueByStatusResponse;
 import com.aust.its.dto.IssuePayload;
 import com.aust.its.dto.model.IssueDto;
 import com.aust.its.dto.model.UserDto;
@@ -48,6 +49,20 @@ public class IssueMapper {
                 .rejectionReason(issue.getRejectionReason())
                 .userDto(userDto)
                 .categoryDtoList(categoryDtoList)
+                .build();
+    }
+
+    public static IssueByStatusResponse getIssueByStatus(Issue issue) {
+        return IssueByStatusResponse
+                .builder()
+                .id(issue.getId())
+                .title(issue.getTitle())
+                .description(issue.getDescription())
+                .user(issue.getUser())
+                .status(issue.getStatus())
+                .createdAt(issue.getCreatedAt())
+                .completedAt(issue.getCompletedAt())
+                .serialId(issue.getSerialId())
                 .build();
     }
 }

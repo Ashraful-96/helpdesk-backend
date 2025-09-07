@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,6 @@ public class CacheService {
     }
 
     public TokenDataListView getAllTokensWithTTL() {
-        Map<String, Map<String, Object>> result = new HashMap<>();
         long now = System.currentTimeMillis();
         List<TokenDataView> tokenDataViewList = new ArrayList<>();
 
@@ -67,7 +65,7 @@ public class CacheService {
                     remaining = 0;
                 }
 
-                tokenDataViewList.add(new TokenDataView(data.randomUUID(), remaining));
+                tokenDataViewList.add(new TokenDataView(userId, data.randomUUID(), remaining));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

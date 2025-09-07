@@ -39,7 +39,7 @@ public class JwtUtils {
             String userInfoJson = claims.get("userInfo", String.class);
             return objectMapper.readValue(userInfoJson, JwtUsrInfo.class);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid token", e);
+            throw new RuntimeException("Invalid JWT token", e);
         }
     }
 

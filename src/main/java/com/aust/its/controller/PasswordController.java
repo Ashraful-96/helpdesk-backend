@@ -4,20 +4,17 @@ import com.aust.its.dto.ChangePasswordPayload;
 import com.aust.its.dto.ForgetPasswordPayload;
 import com.aust.its.dto.PasswordValidationTokenPayload;
 import com.aust.its.service.PasswordService;
+import com.aust.its.utils.Const;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
-import java.util.Base64;
-import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -30,24 +27,15 @@ public class PasswordController {
     private final PasswordService passwordService;
 
     @PostMapping("/forget")
-    public String forgetPassword(@RequestBody ForgetPasswordPayload forgetPasswordPayload) {
-        String randomNumber = UUID.randomUUID().toString().substring(0, 8);
-        long timestamp = Instant.now().toEpochMilli();
-
-        String data = randomNumber + ":" + timestamp;
-        String encoded = Base64.getEncoder().encodeToString(data.getBytes());
-
-        passwordService.storeToken(forgetPasswordPayload.userId(), randomNumber);
-        return encoded;
+    public ResponseEntity<?> forgetPassword(@RequestBody ForgetPasswordPayload forgetPasswordPayload) {
+        return ResponseEntity.ok(passwordService.storeToken(forgetPasswordPayload.userId()));
     }
 
     @PostMapping("/validate-token")
-    public String validateToken(@RequestBody PasswordValidationTokenPayload passwordValidationTokenPayload) {
+    public ResponseEntity<?> validateToken(@RequestBody PasswordValidationTokenPayload passwordValidationTokenPayload) {
         boolean isValid = passwordService.isPasswordUpdateTokenValid(passwordValidationTokenPayload.userId(), passwordValidationTokenPayload.token());
-        if(isValid) {
-            return "Valid Token !!";
-        }
-        return "Invalid Token !!";
+        String tokenValidationMessage = isValid ? Const.token.VALID_TOKEN : Const.token.INVALID_TOKEN;
+        return ResponseEntity.ok(tokenValidationMessage);
     }
 
     @PostMapping("/change")
@@ -63,19 +51,15 @@ public class PasswordController {
             boolean isValid = passwordService.isPasswordUpdateTokenValid(userName, changePasswordPayload.token());
 
             if(!isValid) {
-                throw new RuntimeException("Invalid Token !!");
+                throw new RuntimeException(Const.token.INVALID_TOKEN);
             }
         } else {
             userName = userDetails.getUsername();
         }
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userName, changePasswordPayload.oldPassword())
-            );
-        } catch(BadCredentialsException e) {
-            throw new RuntimeException("Incorrect Username or password" , e);
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userName, changePasswordPayload.oldPassword())
+        );
 
         return passwordService.updatePassword(userName, changePasswordPayload.newPassword());
     }
