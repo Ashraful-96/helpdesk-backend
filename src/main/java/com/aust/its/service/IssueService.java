@@ -2,7 +2,7 @@ package com.aust.its.service;
 
 import com.aust.its.dto.*;
 import com.aust.its.dto.model.IssueDto;
-import com.aust.its.dto.pagination.PagedResponse;
+import com.aust.its.dto.pagination.PageResponse;
 import com.aust.its.entity.*;
 import com.aust.its.enums.IssueStatus;
 import com.aust.its.enums.Role;
@@ -313,7 +313,7 @@ public class IssueService {
     }
 
 
-    public PagedResponse<IssueResponseDto> getAllIssues(int page, int size, IssueStatus status) {
+    public PageResponse<IssueResponseDto> getAllIssues(int page, int size, IssueStatus status) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Issue> issuePage;
 
@@ -341,7 +341,7 @@ public class IssueService {
                         .build()
         ).toList();
 
-        return PagedResponse.<IssueResponseDto>builder()
+        return PageResponse.<IssueResponseDto>builder()
                 .content(issueList)
                 .pageNumber(issuePage.getNumber())
                 .pageSize(issuePage.getSize())

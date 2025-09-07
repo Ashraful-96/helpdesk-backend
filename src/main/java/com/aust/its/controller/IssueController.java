@@ -2,7 +2,7 @@ package com.aust.its.controller;
 
 import com.aust.its.dto.*;
 import com.aust.its.dto.model.IssueDto;
-import com.aust.its.dto.pagination.PagedResponse;
+import com.aust.its.dto.pagination.PageResponse;
 import com.aust.its.entity.Category;
 import com.aust.its.entity.Issue;
 import com.aust.its.entity.User;
@@ -169,7 +169,7 @@ public class IssueController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedResponse<IssueResponseDto>> getAllIssues(
+    public ResponseEntity<PageResponse<IssueResponseDto>> getAllIssues(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) IssueStatus status) {
