@@ -6,6 +6,8 @@ import com.aust.its.entity.User;
 import com.aust.its.exception.UserAlreadyExistsException;
 import com.aust.its.exception.UserNotFoundException;
 import com.aust.its.repository.UserRepository;
+import com.aust.its.utils.Commons;
+import com.aust.its.utils.Const;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,11 +30,11 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(payload.userId());
 
         if(userOptional.isEmpty()) {
-            throw new UserNotFoundException("the user is not an IUMS user");
+            throw new UserNotFoundException("the user is not an iums user");
         }
 
         if(helpDeskUserService.isHelpDeskUserAlreadyExists(payload.userId())) {
-            throw new UserAlreadyExistsException("the user is already exists in the helpDesk system");
+            throw new UserAlreadyExistsException("the user is already exists in the helpdesk system");
         }
 
         User user = userOptional.get();
@@ -41,10 +43,10 @@ public class UserService {
         helpDeskUserToSave.setEmail(payload.email());
         helpDeskUserToSave.setPassword(customPasswordEncoder.encode(payload.password()));
 
-        if(user.getEmployeeId() != null) {
-            helpDeskUserToSave.setRoleId(13000);
+        if(!Commons.isNullOrEmpty(user.getEmployeeId())) {
+            helpDeskUserToSave.setRoleId(Const.Role.EMPLOYEE_ROLE_ID);
         } else {
-            helpDeskUserToSave.setRoleId(13001);
+            helpDeskUserToSave.setRoleId(Const.Role.STUDENT_ROLE_ID);
         }
 
         return helpDeskUserService.saveHelpDeskUser(helpDeskUserToSave);

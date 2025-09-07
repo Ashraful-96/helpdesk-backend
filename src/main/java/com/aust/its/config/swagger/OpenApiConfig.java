@@ -14,7 +14,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("HelpDesk").description("Aust Issue Tracking System").version("v1.0.0"))
+                .info(new Info().title("HelpDesk").description("AUST Issue Tracking System").version("v1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList("HelpDesk"))
                 .components(new Components().addSecuritySchemes("HelpDesk", new SecurityScheme()
                         .name("HelpDesk").type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));

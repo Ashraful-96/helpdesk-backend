@@ -10,6 +10,13 @@ import com.aust.its.service.UserService;
 import com.aust.its.utils.Commons;
 import com.aust.its.utils.Const;
 import com.aust.its.utils.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +41,39 @@ public class AuthController {
     private final CustomUserDetailsService customUserDetailsService;
 
 
+    @Operation(
+            summary = "User Login",
+            description = "Authenticate a user using userId and password, and return JWT tokens.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Login credentials",
+                    content = @Content(
+                            schema = @Schema(implementation = LoginPayload.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successful authentication, returns access and refresh tokens",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = AuthenticationResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Invalid credentials",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content
+                    )
+            }
+    )
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody LoginPayload loginPayload) throws BadCredentialsException {
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody LoginPayload loginPayload) {
         logger.info("login payload is : {}", loginPayload);
 
         authenticationManager.authenticate(
@@ -45,6 +83,32 @@ public class AuthController {
         return authenticationResponse(loginPayload.userId());
     }
 
+    @Operation(
+            summary = "User Registration",
+            description = "Register User for the first time in the HelpDesk System",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Registration Payload",
+                    content = @Content(
+                            schema = @Schema(implementation = RegisterPayload.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully registered, returns registered userId and role",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = RegisterResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "User already exists in the helpdesk system",
+                            content = @Content
+                    )
+            }
+    )
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterPayload registerPayload) {
         logger.info("registration payload is : {}", registerPayload);
@@ -52,6 +116,72 @@ public class AuthController {
         return ResponseEntity.ok(new RegisterResponse(user.getUserId(), user.getRoleId()));
     }
 
+
+//    @Operation(
+//            summary = "Generate New JWT Token",
+//            description = "Generate a new access and refresh token using the existing valid refresh token passed in the `Authorization` header.",
+//            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+//                    required = true,
+//                    description = "Refresh Token Payload",
+//                    content = @Content(
+//                            schema = @Schema(implementation = String.class)
+//                    )
+//            ),
+//            responses = {
+//                    @ApiResponse(
+//                            responseCode = "200",
+//                            description = "New JWT tokens (access token and refresh token)",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = AuthenticationResponse.class)
+//                            )
+//                    ),
+//                    @ApiResponse(
+//                            responseCode = "400",
+//                            description = "Invalid refresh token passed in the request",
+//                            content = @Content
+//                    ),
+//                    @ApiResponse(
+//                            responseCode = "401",
+//                            description = "Missing or malformed Authorization header",
+//                            content = @Content
+//                    )
+//            }
+//    )
+
+    @Operation(
+            summary = "Generate New JWT Token",
+            description = "Generate a new access and refresh token using the existing valid refresh token passed in the `Authorization` header.",
+            parameters = {
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Bearer token with refresh token",
+                            required = true,
+                            in = ParameterIn.HEADER
+//                            schema = @Schema(type = "string", format = "Bearer {token}")
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "New JWT tokens (access token and refresh token)",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = AuthenticationResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid refresh token passed in the request",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Missing or malformed Authorization header",
+                            content = @Content
+                    )
+            }
+    )
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request) {
         final String authorizationHeader = request.getHeader("Authorization");
@@ -63,7 +193,7 @@ public class AuthController {
         final String token = authorizationHeader.substring(7);
 
         if(!JwtUtils.validateToken(token)) {
-            throw new BadCredentialsException("Invalid JWT token");
+            throw new BadCredentialsException("Invalid refresh token");
         }
 
         String userId = JwtUtils.extractUsername(token);

@@ -14,6 +14,7 @@ public class Const {
             "/v2/api-docs",
             "/api/auth/login",
             "/api/auth/register",
+            "/api/auth/refresh",
             "/api/password/forget",
             "/api/password/change",
 
@@ -41,8 +42,13 @@ public class Const {
         public static final long REFRESH_TOKEN_EXPIRATION_MILISEC = 1000 * 60 * 7; // 7 minutes
     }
 
-    public static class token {
+    public static class Token {
         public static final String VALID_TOKEN = "token is valid";
         public static final String INVALID_TOKEN = "token is invalid";
+    }
+
+    public static class Role {
+        public static final long EMPLOYEE_ROLE_ID = 13000;
+        public static final long STUDENT_ROLE_ID = 13001;
     }
 }

@@ -34,7 +34,7 @@ public class PasswordController {
     @PostMapping("/validate-token")
     public ResponseEntity<String> validateToken(@RequestBody PasswordValidationTokenPayload passwordValidationTokenPayload) {
         boolean isValid = passwordService.isPasswordUpdateTokenValid(passwordValidationTokenPayload.userId(), passwordValidationTokenPayload.token());
-        String tokenValidationMessage = isValid ? Const.token.VALID_TOKEN : Const.token.INVALID_TOKEN;
+        String tokenValidationMessage = isValid ? Const.Token.VALID_TOKEN : Const.Token.INVALID_TOKEN;
         return ResponseEntity.ok(tokenValidationMessage);
     }
 
@@ -51,7 +51,7 @@ public class PasswordController {
             boolean isValid = passwordService.isPasswordUpdateTokenValid(userName, changePasswordPayload.token());
 
             if(!isValid) {
-                throw new RuntimeException(Const.token.INVALID_TOKEN);
+                throw new RuntimeException(Const.Token.INVALID_TOKEN);
             }
         } else {
             userName = userDetails.getUsername();
