@@ -1,6 +1,8 @@
 package com.aust.its.controller;
 
 import com.aust.its.dto.*;
+import com.aust.its.dto.model.IssueDto;
+import com.aust.its.dto.pagination.PageResponse;
 import com.aust.its.entity.Issue;
 import com.aust.its.enums.IssueStatus;
 import com.aust.its.service.CategoryService;
@@ -33,17 +35,15 @@ public class IssueController {
 
     private static final Logger logger = LoggerFactory.getLogger(IssueController.class);
     private final IssueService issueService;
-    private final UserService userService;
-    private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<?> submitIssue(@RequestBody IssuePayload issuePayload) {
+    public ResponseEntity<IssueDto> submitIssue(@RequestBody IssuePayload issuePayload) {
         logger.info("Issue Payload :: {}", issuePayload);
         return ResponseEntity.ok(issueService.createIssue(issuePayload));
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getIssues(@PathVariable("id") String userId,
+    public ResponseEntity<List<Issue>> getIssues(@PathVariable("id") String userId,
                                  @RequestParam IssueStatus status) {
 
         logger.info("finding issues of userId :: {} for status :: {}", userId, status);
@@ -51,43 +51,43 @@ public class IssueController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<?> getIssuesByStatus(@PathVariable("status") IssueStatus status) {
+    public ResponseEntity<List<IssueByStatusResponse>> getIssuesByStatus(@PathVariable("status") IssueStatus status) {
         logger.info("finding issues of status :: {}", status);
         return ResponseEntity.ok(issueService.getIssuesByStatus(status));
     }
 
     @PostMapping("{id}/assign")
-    public ResponseEntity<?> assignIssueToDeveloper(@PathVariable Long id,
-                                                            @RequestBody IssueAssignPayload issueAssignPayload) {
+    public ResponseEntity<DeveloperAssignedResponse> assignIssueToDeveloper(@PathVariable Long id,
+                                                                            @RequestBody IssueAssignPayload issueAssignPayload) {
         logger.info("Assigning issue {} to developer", id);
         return ResponseEntity.ok(issueService.assignIssue(id, issueAssignPayload));
     }
 
     @PostMapping("{id}/reject")
-    public ResponseEntity<?> rejectIssue(@PathVariable Long id,
-                                           @RequestBody IssueRejectPayload issueRejectPayload) {
+    public ResponseEntity<IssueRejectResponse> rejectIssue(@PathVariable Long id,
+                                                           @RequestBody IssueRejectPayload issueRejectPayload) {
         return ResponseEntity.ok(issueService.rejectIssue(id, issueRejectPayload));
     }
 
     @PutMapping("{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id,
-                                              @RequestBody IssueStatusUpdatePayload issueStatusUpdatePayload) {
+    public ResponseEntity<IssueDto> updateStatus(@PathVariable Long id,
+                                                 @RequestBody IssueStatusUpdatePayload issueStatusUpdatePayload) {
         return ResponseEntity.ok(issueService.updateIssueByStatus(id, issueStatusUpdatePayload));
     }
 
     @PutMapping("{id}/assign")
-    public ResponseEntity<?> updateAssignee(@PathVariable("id") Long issueId,
-                                                @RequestBody AssignDeveloperPayload assignDeveloperPayload) {
+    public ResponseEntity<IssueDto> updateAssignee(@PathVariable("id") Long issueId,
+                                                   @RequestBody AssignDeveloperPayload assignDeveloperPayload) {
         return ResponseEntity.ok(issueService.updateAssignee(issueId, assignDeveloperPayload.developerId()));
     }
 
     @GetMapping("/count")
-    public ResponseEntity<?> getIssueCount() {
+    public ResponseEntity<List<IssueCountDto>> getIssueCount() {
         return ResponseEntity.ok(issueService.getAllIssueCount());
     }
 
     @GetMapping("/{status}/count")
-    public ResponseEntity<?> getIssueCountByStatus(@PathVariable("status") IssueStatus issueStatus) {
+    public ResponseEntity<IssueCountDto> getIssueCountByStatus(@PathVariable("status") IssueStatus issueStatus) {
         return ResponseEntity.ok(issueService.getIssueCountByStatus(issueStatus));
     }
 
@@ -161,7 +161,7 @@ public class IssueController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllIssues(
+    public ResponseEntity<PageResponse<IssueResponseDto>> getAllIssues(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) IssueStatus status) {

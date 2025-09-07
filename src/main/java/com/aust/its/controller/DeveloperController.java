@@ -6,6 +6,7 @@ import com.aust.its.service.DeveloperService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,16 +21,16 @@ public class DeveloperController {
     private final DeveloperService developerService;
 
     @GetMapping
-    public List<Developer> getDevelopers() {
+    public ResponseEntity<List<Developer>> getDevelopers() {
         logger.info("getDevelopers from controller");
-        return developerService.getAll();
+        return ResponseEntity.ok(developerService.getAll());
     }
 
     @GetMapping("{id}/issues")
-    public IssuesOfDeveloperDto getIssuesOfDeveloper(@PathVariable("id") String userId) {
+    public ResponseEntity<IssuesOfDeveloperDto> getIssuesOfDeveloper(@PathVariable("id") String userId) {
         Developer developer = developerService.getByUserId(userId);
         logger.info("Finding issues of developer : {}", developer.getId());
 
-        return developerService.getIssuesOfDeveloper(developer.getId());
+        return ResponseEntity.ok(developerService.getIssuesOfDeveloper(developer.getId()));
     }
 }

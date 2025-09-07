@@ -35,7 +35,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody LoginPayload loginPayload) throws BadCredentialsException {
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody LoginPayload loginPayload) throws BadCredentialsException {
         logger.info("login payload is : {}", loginPayload);
 
         authenticationManager.authenticate(
@@ -46,14 +46,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterPayload registerPayload) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterPayload registerPayload) {
         logger.info("registration payload is : {}", registerPayload);
         HelpDeskUser user = userService.register(registerPayload);
         return ResponseEntity.ok(new RegisterResponse(user.getUserId(), user.getRoleId()));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+    public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request) {
         final String authorizationHeader = request.getHeader("Authorization");
 
         if(Commons.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
@@ -70,7 +70,7 @@ public class AuthController {
         return authenticationResponse(userId);
     }
 
-    private ResponseEntity<?> authenticationResponse(String userId) {
+    private ResponseEntity<AuthenticationResponse> authenticationResponse(String userId) {
         final UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
         final String accessToken = JwtUtils.generateToken(userDetails, Const.Jwt.ACCESS_TOKEN_EXPIRATION_MILISEC);
         final String refreshToken = JwtUtils.generateToken(userDetails, Const.Jwt.REFRESH_TOKEN_EXPIRATION_MILISEC);

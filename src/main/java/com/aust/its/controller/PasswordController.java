@@ -27,19 +27,19 @@ public class PasswordController {
     private final PasswordService passwordService;
 
     @PostMapping("/forget")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgetPasswordPayload forgetPasswordPayload) {
+    public ResponseEntity<String> forgetPassword(@RequestBody ForgetPasswordPayload forgetPasswordPayload) {
         return ResponseEntity.ok(passwordService.storeToken(forgetPasswordPayload.userId()));
     }
 
     @PostMapping("/validate-token")
-    public ResponseEntity<?> validateToken(@RequestBody PasswordValidationTokenPayload passwordValidationTokenPayload) {
+    public ResponseEntity<String> validateToken(@RequestBody PasswordValidationTokenPayload passwordValidationTokenPayload) {
         boolean isValid = passwordService.isPasswordUpdateTokenValid(passwordValidationTokenPayload.userId(), passwordValidationTokenPayload.token());
         String tokenValidationMessage = isValid ? Const.token.VALID_TOKEN : Const.token.INVALID_TOKEN;
         return ResponseEntity.ok(tokenValidationMessage);
     }
 
     @PostMapping("/change")
-    public String changePassword(@RequestBody @Valid ChangePasswordPayload changePasswordPayload, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordPayload changePasswordPayload, @AuthenticationPrincipal UserDetails userDetails) {
         String userName = null;
 
         if(userDetails == null) {
@@ -61,6 +61,6 @@ public class PasswordController {
                 new UsernamePasswordAuthenticationToken(userName, changePasswordPayload.oldPassword())
         );
 
-        return passwordService.updatePassword(userName, changePasswordPayload.newPassword());
+        return ResponseEntity.ok(passwordService.updatePassword(userName, changePasswordPayload.newPassword()));
     }
 }

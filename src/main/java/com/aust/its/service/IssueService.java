@@ -134,7 +134,7 @@ public class IssueService {
                 .build();
     }
 
-    public Issue updateIssueByStatus(Long issueId, IssueStatusUpdatePayload issueStatusUpdatePayload) {
+    public IssueDto updateIssueByStatus(Long issueId, IssueStatusUpdatePayload issueStatusUpdatePayload) {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new RuntimeException("issue not found with issue id : " + issueId));
 
@@ -208,10 +208,11 @@ public class IssueService {
             }
         }
 
-        return issueRepository.save(issue);
+        Issue savedIssue = issueRepository.save(issue);
+        return IssueMapper.entityToDto(savedIssue);
     }
 
-    public Issue updateAssignee(Long issueId, Long developerId) {
+    public IssueDto updateAssignee(Long issueId, Long developerId) {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new RuntimeException("Issue not found with ID: " + issueId));
 
@@ -228,7 +229,8 @@ public class IssueService {
             issue.setRejectedBy(developer);
         }
 
-        return issueRepository.save(issue);
+        Issue savedIssue = issueRepository.save(issue);
+        return IssueMapper.entityToDto(savedIssue);
     }
 
     @Transactional
